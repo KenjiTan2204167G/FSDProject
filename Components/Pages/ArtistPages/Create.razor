@@ -1,0 +1,59 @@
+﻿@page "/artists/create"
+@using Microsoft.EntityFrameworkCore
+@using TRUMPet.Domain
+@inject IDbContextFactory<TRUMPet.Data.TRUMPetContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>Artist</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Artist" OnValidSubmit="AddArtist" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="songid" class="form-label">SongID:</label> 
+                <InputNumber id="songid" @bind-Value="Artist.SongID" class="form-control" /> 
+                <ValidationMessage For="() => Artist.SongID" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="dateadded" class="form-label">DateAdded:</label> 
+                <InputDate id="dateadded" @bind-Value="Artist.DateAdded" class="form-control" /> 
+                <ValidationMessage For="() => Artist.DateAdded" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="artistname" class="form-label">Artistname:</label> 
+                <InputText id="artistname" @bind-Value="Artist.Artistname" class="form-control" /> 
+                <ValidationMessage For="() => Artist.Artistname" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="songname" class="form-label">SongName:</label> 
+                <InputText id="songname" @bind-Value="Artist.SongName" class="form-control" /> 
+                <ValidationMessage For="() => Artist.SongName" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/artists">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Artist Artist { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddArtist()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Artist.Add(Artist);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/artists");
+    }
+}

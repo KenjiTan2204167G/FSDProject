@@ -1,0 +1,62 @@
+﻿@page "/music-library"
+@attribute [StreamRendering]
+
+<PageTitle>Music Library</PageTitle>
+
+<h1>Music Library</h1>
+
+<p>Here are your favourite Grooves</p>
+
+@if (songs == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Artist Name</th>
+                <th>Song Name</th>
+                <th>Date Added</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var song in songs)
+            {
+                <tr>
+                    <td>@song.ArtistName</td>
+                    <td>@song.SongName</td>
+                    <td>@song.DateAdded.ToShortDateString()</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private Song[]? songs;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Simulate asynchronous loading to demonstrate streaming rendering
+        await Task.Delay(500);
+
+        // Simulated song data
+        songs = new[]
+        {
+            new Song { ArtistName = "The Beatles", SongName = "Yesterday", DateAdded = DateTime.Now.AddDays(-10) },
+            new Song { ArtistName = "Led Zeppelin", SongName = "Stairway to Heaven", DateAdded = DateTime.Now.AddDays(-20) },
+            new Song { ArtistName = "Michael Jackson", SongName = "Thriller", DateAdded = DateTime.Now.AddDays(-15) },
+            new Song { ArtistName = "Pink Floyd", SongName = "Comfortably Numb", DateAdded = DateTime.Now.AddDays(-25) },
+            new Song { ArtistName = "Queen", SongName = "Bohemian Rhapsody", DateAdded = DateTime.Now.AddDays(-5) }
+        };
+    }
+
+    private class Song
+    {
+        public string ArtistName { get; set; }
+        public string SongName { get; set; }
+        public DateTime DateAdded { get; set; }
+    }
+}

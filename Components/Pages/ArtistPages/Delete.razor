@@ -1,0 +1,67 @@
+﻿@page "/artists/delete"
+@using Microsoft.EntityFrameworkCore
+@using TRUMPet.Domain
+@inject IDbContextFactory<TRUMPet.Data.TRUMPetContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Delete</PageTitle>
+
+<h1>Delete</h1>
+
+<p>Are you sure you want to delete this?</p>
+<div>
+    <h2>Artist</h2>
+    <hr />
+    @if (artist is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">SongID</dt>
+            <dd class="col-sm-10">@artist.SongID</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">DateAdded</dt>
+            <dd class="col-sm-10">@artist.DateAdded</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Artistname</dt>
+            <dd class="col-sm-10">@artist.Artistname</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">SongName</dt>
+            <dd class="col-sm-10">@artist.SongName</dd>
+        </dl>
+        <EditForm method="post" Model="artist" OnValidSubmit="DeleteArtist" FormName="delete" Enhance>
+            <button type="submit" class="btn btn-danger" disabled="@(artist is null)">Delete</button> |
+            <a href="/artists">Back to List</a>
+        </EditForm>
+    }
+</div>
+
+@code {
+    private Artist? artist;
+
+    [SupplyParameterFromQuery]
+    private int ArtistID { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        artist = await context.Artist.FirstOrDefaultAsync(m => m.ArtistID == ArtistID);
+
+        if (artist is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    private async Task DeleteArtist()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Artist.Remove(artist!);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/artists");
+    }
+}

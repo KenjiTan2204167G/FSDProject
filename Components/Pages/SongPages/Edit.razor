@@ -1,0 +1,109 @@
+﻿@page "/songs/edit"
+@using Microsoft.EntityFrameworkCore
+@using TRUMPet.Domain
+@inject IDbContextFactory<TRUMPet.Data.TRUMPetContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>Song</h2>
+<hr />
+@if (Song is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Song" OnValidSubmit="UpdateSong" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="Song.SongID" value="@Song.SongID" />
+                <div class="mb-3">
+                    <label for="genreid" class="form-label">GenreID:</label>
+                    <InputNumber id="genreid" @bind-Value="Song.GenreID" class="form-control" />
+                    <ValidationMessage For="() => Song.GenreID" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="artistid" class="form-label">ArtistID:</label>
+                    <InputNumber id="artistid" @bind-Value="Song.ArtistID" class="form-control" />
+                    <ValidationMessage For="() => Song.ArtistID" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="dateadded" class="form-label">DateAdded:</label>
+                    <InputDate id="dateadded" @bind-Value="Song.DateAdded" class="form-control" />
+                    <ValidationMessage For="() => Song.DateAdded" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="artistname" class="form-label">Artistname:</label>
+                    <InputText id="artistname" @bind-Value="Song.Artistname" class="form-control" />
+                    <ValidationMessage For="() => Song.Artistname" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="songname" class="form-label">SongName:</label>
+                    <InputText id="songname" @bind-Value="Song.SongName" class="form-control" />
+                    <ValidationMessage For="() => Song.SongName" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/songs">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int SongID { get; set; }
+
+    [SupplyParameterFromForm]
+    private Song? Song { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Song ??= await context.Song.FirstOrDefaultAsync(m => m.SongID == SongID);
+
+        if (Song is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateSong()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(Song!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!SongExists(Song!.SongID))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/songs");
+    }
+
+    private bool SongExists(int songid)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Song.Any(e => e.SongID == songid);
+    }
+}

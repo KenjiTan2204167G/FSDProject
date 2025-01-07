@@ -1,0 +1,64 @@
+﻿@page "/songs/create"
+@using Microsoft.EntityFrameworkCore
+@using TRUMPet.Domain
+@inject IDbContextFactory<TRUMPet.Data.TRUMPetContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>Song</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Song" OnValidSubmit="AddSong" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="genreid" class="form-label">GenreID:</label> 
+                <InputNumber id="genreid" @bind-Value="Song.GenreID" class="form-control" /> 
+                <ValidationMessage For="() => Song.GenreID" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="artistid" class="form-label">ArtistID:</label> 
+                <InputNumber id="artistid" @bind-Value="Song.ArtistID" class="form-control" /> 
+                <ValidationMessage For="() => Song.ArtistID" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="dateadded" class="form-label">DateAdded:</label> 
+                <InputDate id="dateadded" @bind-Value="Song.DateAdded" class="form-control" /> 
+                <ValidationMessage For="() => Song.DateAdded" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="artistname" class="form-label">Artistname:</label> 
+                <InputText id="artistname" @bind-Value="Song.Artistname" class="form-control" /> 
+                <ValidationMessage For="() => Song.Artistname" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="songname" class="form-label">SongName:</label> 
+                <InputText id="songname" @bind-Value="Song.SongName" class="form-control" /> 
+                <ValidationMessage For="() => Song.SongName" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/songs">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Song Song { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddSong()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Song.Add(Song);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/songs");
+    }
+}

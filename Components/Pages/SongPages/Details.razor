@@ -1,0 +1,54 @@
+﻿@page "/songs/details"
+@using Microsoft.EntityFrameworkCore
+@using TRUMPet.Domain
+@inject IDbContextFactory<TRUMPet.Data.TRUMPetContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>Song</h2>
+    <hr />
+    @if (song is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">GenreID</dt>
+            <dd class="col-sm-10">@song.GenreID</dd>
+            <dt class="col-sm-2">ArtistID</dt>
+            <dd class="col-sm-10">@song.ArtistID</dd>
+            <dt class="col-sm-2">DateAdded</dt>
+            <dd class="col-sm-10">@song.DateAdded</dd>
+            <dt class="col-sm-2">Artistname</dt>
+            <dd class="col-sm-10">@song.Artistname</dd>
+            <dt class="col-sm-2">SongName</dt>
+            <dd class="col-sm-10">@song.SongName</dd>
+        </dl>
+        <div>
+            <a href="@($"/songs/edit?songid={song.SongID}")">Edit</a> |
+            <a href="@($"/songs")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private Song? song;
+
+    [SupplyParameterFromQuery]
+    private int SongID { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        song = await context.Song.FirstOrDefaultAsync(m => m.SongID == SongID);
+
+        if (song is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}
