@@ -1,0 +1,40 @@
+﻿@page "/genres"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using TRUMPet.Domain
+@using TRUMPet.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<TRUMPet.Data.TRUMPetContext> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="genres/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.Genre">
+    <PropertyColumn Property="genre => genre.Name" />
+    <PropertyColumn Property="genre => genre.Description" />
+    <PropertyColumn Property="genre => genre.DateAdded" />
+    <PropertyColumn Property="genre => genre.Artistname" />
+    <PropertyColumn Property="genre => genre.SongName" />
+
+    <TemplateColumn Context="genre">
+        <a href="@($"genres/edit?genreid={genre.GenreID}")">Edit</a> |
+        <a href="@($"genres/details?genreid={genre.GenreID}")">Details</a> |
+        <a href="@($"genres/delete?genreid={genre.GenreID}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private TRUMPetContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

@@ -1,0 +1,64 @@
+﻿@page "/genres/create"
+@using Microsoft.EntityFrameworkCore
+@using TRUMPet.Domain
+@inject IDbContextFactory<TRUMPet.Data.TRUMPetContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>Genre</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Genre" OnValidSubmit="AddGenre" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="name" class="form-label">Name:</label> 
+                <InputText id="name" @bind-Value="Genre.Name" class="form-control" /> 
+                <ValidationMessage For="() => Genre.Name" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="description" class="form-label">Description:</label> 
+                <InputText id="description" @bind-Value="Genre.Description" class="form-control" /> 
+                <ValidationMessage For="() => Genre.Description" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="dateadded" class="form-label">DateAdded:</label> 
+                <InputDate id="dateadded" @bind-Value="Genre.DateAdded" class="form-control" /> 
+                <ValidationMessage For="() => Genre.DateAdded" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="artistname" class="form-label">Artistname:</label> 
+                <InputText id="artistname" @bind-Value="Genre.Artistname" class="form-control" /> 
+                <ValidationMessage For="() => Genre.Artistname" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="songname" class="form-label">SongName:</label> 
+                <InputText id="songname" @bind-Value="Genre.SongName" class="form-control" /> 
+                <ValidationMessage For="() => Genre.SongName" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/genres">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Genre Genre { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddGenre()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Genre.Add(Genre);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/genres");
+    }
+}
