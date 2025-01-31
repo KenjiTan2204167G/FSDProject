@@ -8,7 +8,7 @@ builder.Services.AddDbContextFactory<TRUMPetContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("TRUMPetContext") ?? throw new InvalidOperationException("Connection string 'TRUMPetContext' not found.")));
 
 builder.Services.AddQuickGridEntityFrameworkAdapter();
-
+builder.Services.AddScoped<HttpClient>();
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 // Add services to the container.
 builder.Services.AddRazorComponents()

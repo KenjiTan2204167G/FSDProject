@@ -1,0 +1,32 @@
+@page "/register"
+@inject HttpClient Http
+
+<h3>Staff Registration</h3>
+
+@if (!string.IsNullOrEmpty(message))
+{
+    <p>@message</p>
+}
+
+<input @bind="registerDto.Name" placeholder="Name" />
+<input @bind="registerDto.Email" placeholder="Email" />
+<input type="password" @bind="registerDto.Password" placeholder="Password" />
+<button @onclick="Register">Register</button>
+
+@code {
+    private StaffRegisterDto registerDto = new();
+    private string? message;
+
+    private async Task Register()
+    {
+        var response = await Http.PostAsJsonAsync("api/StaffAuth/register", registerDto);
+        message = await response.Content.ReadAsStringAsync();
+    }
+
+    public class StaffRegisterDto
+    {
+        public string Name { get; set; } = "";
+        public string Email { get; set; } = "";
+        public string Password { get; set; } = "";
+    }
+}

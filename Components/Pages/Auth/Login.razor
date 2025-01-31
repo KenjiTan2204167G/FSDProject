@@ -1,0 +1,47 @@
+@page "/login"
+@inject HttpClient Http
+
+<h3>Staff Login</h3>
+
+@if (!string.IsNullOrEmpty(message))
+{
+    <p style="color: red;">@message</p>
+}
+
+<input @bind="loginDto.Email" placeholder="Email" />
+<input type="password" @bind="loginDto.Password" placeholder="Password" />
+<button @onclick="HandleLogin">Login</button>
+
+@code {
+    private StaffLoginDto loginDto = new();
+    private string? message;
+
+    private async Task HandleLogin()
+    {
+        try
+        {
+            var response = await Http.PostAsJsonAsync("api/StaffAuth/login", loginDto);
+            if (response.IsSuccessStatusCode)
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+                message = "Login successful!";
+                Console.WriteLine(responseContent); // Debugging Output
+            }
+            else
+            {
+                message = "Invalid credentials. Try again.";
+            }
+        }
+        catch (Exception ex)
+        {
+            message = "Error connecting to server.";
+            Console.WriteLine($"Login error: {ex.Message}");
+        }
+    }
+
+    public class StaffLoginDto
+    {
+        public string Email { get; set; } = "";
+        public string Password { get; set; } = "";
+    }
+}
