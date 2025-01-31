@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.General;
 using TRUMPet.Domain;
 
 namespace TRUMPet.Data
 {
     public class TRUMPetContext : DbContext
     {
-        public TRUMPetContext (DbContextOptions<TRUMPetContext> options)
+        public TRUMPetContext(IdentityDbContext<TRUMPetContext> options)
             : base(options)
         {
         }

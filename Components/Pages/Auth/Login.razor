@@ -1,5 +1,6 @@
 @page "/login"
 @inject HttpClient Http
+@inject NavigationManager Navigation
 
 <h3>Staff Login</h3>
 
@@ -23,9 +24,14 @@
             var response = await Http.PostAsJsonAsync("api/StaffAuth/login", loginDto);
             if (response.IsSuccessStatusCode)
             {
-                var responseContent = await response.Content.ReadAsStringAsync();
-                message = "Login successful!";
-                Console.WriteLine(responseContent); // Debugging Output
+                var result = await response.Content.ReadFromJsonAsync<LoginResponse>();
+                message = "Login successful! Redirecting...";
+
+                // ? Store JWT token in session storage
+                await sessionStorage.SetItemAsync("authToken", result.Token);
+
+                await Task.Delay(1000);
+                Navigation.NavigateTo("/dashboard"); // Redirect after login
             }
             else
             {
@@ -43,5 +49,10 @@
     {
         public string Email { get; set; } = "";
         public string Password { get; set; } = "";
+    }
+
+    public class LoginResponse
+    {
+        public string Token { get; set; }
     }
 }
