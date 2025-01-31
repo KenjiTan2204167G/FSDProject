@@ -1,0 +1,109 @@
+﻿@page "/staff/edit"
+@using Microsoft.EntityFrameworkCore
+@using TRUMPet.Domain
+@inject IDbContextFactory<TRUMPet.Data.TRUMPetContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>Staff</h2>
+<hr />
+@if (Staff is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Staff" OnValidSubmit="UpdateStaff" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="Staff.StaffID" value="@Staff.StaffID" />
+                <div class="mb-3">
+                    <label for="name" class="form-label">Name:</label>
+                    <InputText id="name" @bind-Value="Staff.Name" class="form-control" />
+                    <ValidationMessage For="() => Staff.Name" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email:</label>
+                    <InputText id="email" @bind-Value="Staff.Email" class="form-control" />
+                    <ValidationMessage For="() => Staff.Email" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="passwordhash" class="form-label">PasswordHash:</label>
+                    <InputText id="passwordhash" @bind-Value="Staff.PasswordHash" class="form-control" />
+                    <ValidationMessage For="() => Staff.PasswordHash" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="role" class="form-label">Role:</label>
+                    <InputText id="role" @bind-Value="Staff.Role" class="form-control" />
+                    <ValidationMessage For="() => Staff.Role" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="datecreated" class="form-label">DateCreated:</label>
+                    <InputDate id="datecreated" @bind-Value="Staff.DateCreated" class="form-control" />
+                    <ValidationMessage For="() => Staff.DateCreated" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/staff">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int StaffID { get; set; }
+
+    [SupplyParameterFromForm]
+    private Staff? Staff { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Staff ??= await context.Staffs.FirstOrDefaultAsync(m => m.StaffID == StaffID);
+
+        if (Staff is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateStaff()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(Staff!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!StaffExists(Staff!.StaffID))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/staff");
+    }
+
+    private bool StaffExists(int staffid)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Staffs.Any(e => e.StaffID == staffid);
+    }
+}

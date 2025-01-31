@@ -1,0 +1,64 @@
+﻿@page "/staff/create"
+@using Microsoft.EntityFrameworkCore
+@using TRUMPet.Domain
+@inject IDbContextFactory<TRUMPet.Data.TRUMPetContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>Staff</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Staff" OnValidSubmit="AddStaff" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="name" class="form-label">Name:</label> 
+                <InputText id="name" @bind-Value="Staff.Name" class="form-control" /> 
+                <ValidationMessage For="() => Staff.Name" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="email" class="form-label">Email:</label> 
+                <InputText id="email" @bind-Value="Staff.Email" class="form-control" /> 
+                <ValidationMessage For="() => Staff.Email" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="passwordhash" class="form-label">PasswordHash:</label> 
+                <InputText id="passwordhash" @bind-Value="Staff.PasswordHash" class="form-control" /> 
+                <ValidationMessage For="() => Staff.PasswordHash" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="role" class="form-label">Role:</label> 
+                <InputText id="role" @bind-Value="Staff.Role" class="form-control" /> 
+                <ValidationMessage For="() => Staff.Role" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="datecreated" class="form-label">DateCreated:</label> 
+                <InputDate id="datecreated" @bind-Value="Staff.DateCreated" class="form-control" /> 
+                <ValidationMessage For="() => Staff.DateCreated" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/staff">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Staff Staff { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddStaff()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Staffs.Add(Staff);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/staff");
+    }
+}
